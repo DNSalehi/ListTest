@@ -1,0 +1,4 @@
+<root>
+    <account isMain="true" accountID="#1#" accountBudget="50.50" accountName="Noodlestar"/>
+    <account isMain="false" accountID="#2#" accountBudget="150.00" accountName="PandaExpress"/>
+</root>

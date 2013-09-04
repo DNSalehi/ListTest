@@ -1,0 +1,10 @@
+Real Time Budget 
+----------------
+Goal: Checks every 10 seconds if the budget date has been reached.
+
+Process:
+Create timer that calls a function and has a 10 second delay, repeating
+The function called creates a new Date variable, and checks that with the ending budget date variable.
+If times up the function calls appropriate function to clear bar, move list to reports, and reset current list
+
+When page changes, reset timer. (Make sure it runs function when it resets)
