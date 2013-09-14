@@ -78,6 +78,7 @@ NavigationPane {
 				                     onItemAdded: {
 				                         console.log("onItemAdded signal ran.")
 				                         var reportItem = data(indexPath);
+				                         console.log("reportItem.name: " + reportItem.budgetType);
 				                         //var indexP = (indexPath.length == 1) ? indexPath : indexPath[1]
 				                         console.log("size: " + size());
 				                         //Clear graphDataArray when ListView reloads. (Ex: Setting different account)
@@ -217,6 +218,7 @@ NavigationPane {
     }
     
     function smallDate(date) {
+        console.log("smallDate: " + date);
         var splitDate = date.split(".")
         
         if (splitDate[0] == "01")

@@ -80,14 +80,13 @@ Page {
             Container {
                 horizontalAlignment: HorizontalAlignment.Center
                 verticalAlignment: VerticalAlignment.Bottom
-                /*
+                
                 Banner {
                     zoneId: 117145
                     preferredWidth: 300
                     preferredHeight: 50
                     horizontalAlignment: HorizontalAlignment.Center
-                }
-                */
+                } 
             }
     }
     actions: [

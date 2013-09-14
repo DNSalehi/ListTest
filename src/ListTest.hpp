@@ -189,6 +189,8 @@ signals:
 	void updateGraph(QVariant);
 	void setAccountGraph();
 	void reloadWeb();
+	void emptyExpenseList();
+	void notEmptyExpenseList();
 
 public slots:
 	Q_INVOKABLE void checkDate();

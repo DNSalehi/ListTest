@@ -1,5 +1,5 @@
 1
-119
+118
 AccountCreationSheet.qml
 accountinfo.xml
 AccountItem.qml
@@ -16,6 +16,7 @@ EasyKeyboardBudget.qml
 EasyKeypad.qml
 EditPage.qml
 GraphContainer.qml
+images/addLarge.png
 images/barBG.png
 images/barFullBG.png
 images/bartemp.png
@@ -66,7 +67,6 @@ images/newbar/greenerBar.png
 images/newbar/orangeBar.png
 images/newbar/redBar.png
 images/newbar/smallLogo.png
-images/newbar/Thumbs.db
 images/reportsIcon.png
 images/sblogo.png
 images/smallLogo.png
@@ -100,7 +100,6 @@ js/graph.js
 js/images/dragIcon.gif
 js/images/dragIconH.gif
 js/images/lens.png
-js/images/Thumbs.db
 js/jquery-1.8.3.min.js
 js/pie.js
 js/raphael-min.js

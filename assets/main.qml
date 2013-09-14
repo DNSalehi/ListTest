@@ -12,7 +12,7 @@ TabbedPane {
         Transactions {
             id: expensePage
         }
-        onTriggered: addPage.clearAdd()
+        onTriggered: addPage.clearAdd();
         
     }
     
@@ -113,8 +113,14 @@ TabbedPane {
        }
     
     function switchToList() {
-        console.log("Switching to main tab.")
-        mainTab.activeTab = expenseTab
+        console.log("Switching to main tab.");
+        mainTab.activeTab = expenseTab;
+    }
+    
+    function switchToAdd() {
+        console.log("Switching to add tab.");
+        addPage.clearAdd();
+        mainTab.activeTab = addTab;
     }
     
     onCreationCompleted: {

@@ -381,21 +381,15 @@ bool ListTest::loadQMLScene() {
 	amountLabel = tabbedPane->findChild<Label*>("amountLabel");
 
 	setUpAccountModel();
-	qDebug() << "Account Model set up complete.";
 	setUpPeriodListModel();
-	qDebug() << "Period List Model set up complete.";
 	setUpExpenseListModel();
-	qDebug() << "Expense List Model set up complete.";
 	updateBar();
-	qDebug() << "Bar update complete.";
 	setUpPeriodExpensesListModel();
-	qDebug() << "Period Expense List Model set up complete.";
 
 	Application::instance()->setScene(tabbedPane);
 
 	//Loading QTimer
 	loadTimer();
-	qDebug() << "Timer loaded.";
 
 	return true;
 }
@@ -445,13 +439,16 @@ void ListTest::setAccount(QVariant selectedAccount) {
 		//Breaks below...
 		accountList.replace(accountDataIndex, accountMap);
 
+		//Set selected period isMain to true
+		periodMap["isMain"] = "true";
+
 		//Set primary account
 		primaryAccount = selectedAccount;
 
-		addPeriodExpenses();
+		//addPeriodExpenses(); Why modify the expenses?
 		//Save to file
 		saveAccountJson();
-		savePeriods();
+		//savePeriods(); Why save the unchanged periods?
 
 		//Update app components
 		updateAccountView();
@@ -469,6 +466,7 @@ void ListTest::setAccount(QVariant selectedAccount) {
 		_budgetStartDate = periodMap["startDate"].toString();
 		_budgetEndDate = periodMap["endDate"].toString();
 		_budgetType = periodMap["budgetType"].toString();
+		qDebug() << "Account number set to: " + accountMap["accountID"].toString();
 	}
 }
 
@@ -584,7 +582,7 @@ void ListTest::addAccount(const QString &accountName,
 
 	//Update lists
 	updateAccountView();
-	updateListView();
+	updateListView(); //Might need to be fastUpdateListView();
 	updatePeriodView();
 	updateBar();
 }
@@ -985,14 +983,27 @@ void ListTest::fastUpdateListView() {
 	expenseList = jda.load( QDir::homePath() + QString("/user/expenses") + QString("_")
 									+ accountMap["accountID"].toString()
 									+ QString(".json")).value<QVariantList>();
+	QVariantList currentExpenseList = periodMap["expenses"].toList();
+	if (currentExpenseList.count() == 0) {
+		emit emptyExpenseList();
+	} else if (currentExpenseList.count() > 0) {
+		emit notEmptyExpenseList();
+	}
 	expenseModel->clear();
-	expenseModel->insertList(periodMap["expenses"].toList());
+	expenseModel->insertList(currentExpenseList);
 }
 
 void ListTest::updateListView() {
 	expenseList = jda.load( QDir::homePath() + QString("/user/expenses") + QString("_")
 								+ accountMap["accountID"].toString()
 								+ QString(".json")).value<QVariantList>();
+	//Emit emptyExpenseList that will be caught by ListView in Transactions.qml
+	//In order to put a placeholder to encourage adding an expense
+	if (expenseList.count() == 0) {
+		emit emptyExpenseList();
+	} else if (expenseList.count() > 0) {
+		emit notEmptyExpenseList();
+	}
 
 	expenseModel->clear();
 	expenseModel->insertList(expenseList);
@@ -1804,6 +1815,16 @@ void ListTest::setUpPeriodListModel() {
 	periodListView = tabbedPane->findChild<ListView*>("periodListView");
 	periodModel = tabbedPane->findChild<GroupDataModel*>("reportModel");
 
+	if (periodModel)
+		qDebug() << "periodModel found";
+	else
+		qDebug() << "periodModel not found";
+
+	if (periodListView)
+		qDebug() << "periodListView found";
+	else
+		qDebug() << "periodListView not found";
+
 	//Set the periods QVariantMap
 	QVariant primaryPeriod = getPrimaryPeriod();
 	periodMap = primaryPeriod.toMap();
@@ -1813,11 +1834,15 @@ void ListTest::setUpPeriodListModel() {
 
 	//periodModel = new GroupDataModel();
 	periodModel->setParent(this);
-	periodModel->insertList(periodMap["expenses"].toList());
+	qDebug() << "Before insert list";
+	periodModel->insertList(periodList); // This line creates the errors.
+	qDebug() << "After inserting list";
 	periodModel->setGrouping(ItemGrouping::None);
 	periodModel->setSortingKeys(sortingKey);
 	periodModel->setSortedAscending(false);
+	qDebug() << "Before setting data model";
 	periodListView->setDataModel(periodModel);
+	qDebug() << "After setting data model";
 }
 
 QVariant ListTest::getPrimaryPeriod() {
@@ -1834,17 +1859,16 @@ QVariant ListTest::getPrimaryPeriod() {
 }
 
 void ListTest::setUpExpenseListModel() {
-	QStringList sortingKey;
-	sortingKey << "yearRank" << "monthRank" << "dayRank" << "hourRank"
-			<< "minuteRank" << "secondRank";
 	expenseList = periodMap["expenses"].toList();
 
-	expenseModel = new GroupDataModel();
+	if (expenseList.count() == 0) {
+		emit emptyExpenseList();
+	}
+
+	expenseModel = tabbedPane->findChild<GroupDataModel*>("expenseModel");
 	expenseModel->setParent(this);
 	expenseModel->insertList(expenseList);
 	expenseModel->setGrouping(ItemGrouping::None);
-	expenseModel->setSortingKeys(sortingKey);
-	expenseModel->setSortedAscending(false);
 	expenseListView->setDataModel(expenseModel);
 }
 
