@@ -95,6 +95,14 @@ NavigationPane {
 				                             console.log("*qGraphMap.value: " + qGraphMap['value'])
 				                             periodListView.pushGraphDataArray(qGraphMap)
 				                         }
+				                         //Capping the number of periods tracked to 50, performance purpose
+				                         //When the settings page is added, have an option to change this
+				                         if (size() > 50) {
+				                             console.log("Size is greater than 50, removing oldest period.");
+				                             var removablePeriod = data(last());
+                                             //Send command here to C++ to delete removablePeriod from json files
+				                             removeAt(last());
+				                         }
 				                     }
 				                 }
 				             listItemComponents: [
