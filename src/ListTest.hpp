@@ -83,6 +83,7 @@ public:
     Q_INVOKABLE void sendEmail();
     Q_INVOKABLE void setUpAccountListModel();
     Q_INVOKABLE void updateBar();
+    Q_INVOKABLE void removeExcessPeriod(QVariant excessPeriod);
     Q_INVOKABLE bool loadQMLScene();
     Q_INVOKABLE bool verifyPin(const QString &pin);
     Q_INVOKABLE bool hasPin();
@@ -139,7 +140,6 @@ public:
     void saveExpenses();
     void saveAccountJson();
     void addPeriodExpenses();
-    void removeExcessPeriod(QVariant excessPeriod);
     QDate getNewStartDate(QDate oldStartDate);
     QVariantList expenseList;
     QVariantList periodList;

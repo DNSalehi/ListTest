@@ -1796,11 +1796,15 @@ void ListTest::setUpAccountListModel() {
 }
 
 void ListTest::removeExcessPeriod(QVariant excessPeriod) {
+	qDebug() << "Running remove excess period";
 	int excessPeriodIndex = periodList.indexOf(excessPeriod);
 	periodList.removeAt(excessPeriodIndex);
 
+	//Do you need a replace here??
+
 	saveJson();
 	updatePeriodView();
+	emit updateGraph(periodMap);
 	qDebug() << "Period removed from JSON periodList";
 }
 

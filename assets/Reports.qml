@@ -97,12 +97,12 @@ NavigationPane {
 				                         }
 				                         //Capping the number of periods tracked to 50, performance purpose
 				                         //When the settings page is added, have an option to change this
-				                         if (size() > 50) {
+				                         if (size() > 2) {
 				                             console.log("Size is greater than 50, removing oldest period.");
 				                             var removablePeriod = data(last());
+                                             //removeAt(last());
 				                             budgetApp.removeExcessPeriod(removablePeriod);
                                              //Send command here to C++ to delete removablePeriod from json files
-				                             removeAt(last());
 				                         }
 				                     }
 				                 }
