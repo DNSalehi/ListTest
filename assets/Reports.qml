@@ -100,6 +100,7 @@ NavigationPane {
 				                         if (size() > 50) {
 				                             console.log("Size is greater than 50, removing oldest period.");
 				                             var removablePeriod = data(last());
+				                             budgetApp.removeExcessPeriod(removablePeriod);
                                              //Send command here to C++ to delete removablePeriod from json files
 				                             removeAt(last());
 				                         }

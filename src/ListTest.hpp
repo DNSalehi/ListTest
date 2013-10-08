@@ -139,6 +139,7 @@ public:
     void saveExpenses();
     void saveAccountJson();
     void addPeriodExpenses();
+    void removeExcessPeriod(QVariant excessPeriod);
     QDate getNewStartDate(QDate oldStartDate);
     QVariantList expenseList;
     QVariantList periodList;

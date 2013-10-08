@@ -1795,6 +1795,15 @@ void ListTest::setUpAccountListModel() {
 	accountListView->setDataModel(accountModel);
 }
 
+void ListTest::removeExcessPeriod(QVariant excessPeriod) {
+	int excessPeriodIndex = periodList.indexOf(excessPeriod);
+	periodList.removeAt(excessPeriodIndex);
+
+	saveJson();
+	updatePeriodView();
+	qDebug() << "Period removed from JSON periodList";
+}
+
 void ListTest::setUpPeriodListModel() {
 	QStringList sortingKey;
 	sortingKey << "isMain" << "yearRank" << "monthRank" << "dayRank";
