@@ -1795,6 +1795,26 @@ void ListTest::setUpAccountListModel() {
 	accountListView->setDataModel(accountModel);
 }
 
+<<<<<<< HEAD
+=======
+void ListTest::removeExcessPeriod(QVariant excessPeriod) {
+	qDebug() << "Running remove excess period";
+	int excessPeriodIndex = periodList.indexOf(excessPeriod);
+	qDebug() << "excessPeriodIndex: " + QString::number(excessPeriodIndex);
+	periodList.removeAt(excessPeriodIndex);
+
+	//Do you need a replace here??
+
+	savePeriods();
+	updatePeriodView();
+	//Test variables
+	qDebug() << "PeriodMap[endDate]:" + periodMap["endDate"].toString();
+	qDebug() << "PeriodList count:" + QString::number(periodList.count());
+	emit updateGraph(periodMap);
+	qDebug() << "Period removed from JSON periodList";
+}
+
+>>>>>>> e2b994cd1929a8b2ef4f57d3693821e7a32bb83e
 void ListTest::setUpPeriodListModel() {
 	QStringList sortingKey;
 	sortingKey << "isMain" << "yearRank" << "monthRank" << "dayRank";

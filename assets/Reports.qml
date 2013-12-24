@@ -53,7 +53,7 @@ NavigationPane {
 	               }
 	                			
 	                onMessageReceived: {
-	                    console.log("Message received: " + message.data)   
+	                    console.log("CHECK: Message received: " + message.data)   
 	                }
 	                
 	                function reloadWebView() {
@@ -94,6 +94,19 @@ NavigationPane {
 				                             console.log("*qGraphMap.value: " + qGraphMap['value'])
 				                             periodListView.pushGraphDataArray(qGraphMap)
 				                         }
+<<<<<<< HEAD
+=======
+				                         //Capping the number of periods tracked to 50, performance purpose
+				                         //When the settings page is added, have an option to change this
+				                         if (size() > 2) {
+				                             console.log("Size is greater than 50, removing oldest period.");
+				                             var removablePeriod = data(last());
+                                             //removeAt(last());
+				                             budgetApp.removeExcessPeriod(removablePeriod);
+				                             console.log("Reached end of onItemAdded");
+                                             //Send command here to C++ to delete removablePeriod from json files
+				                         }
+>>>>>>> e2b994cd1929a8b2ef4f57d3693821e7a32bb83e
 				                     }
 				                 }
 				             listItemComponents: [
@@ -181,8 +194,8 @@ NavigationPane {
    
    function updateGraph(updatedMap) {
        console.log("About to update graph in javascript")
-       console.log("updatedMap: " + updatedMap)
-       console.log("updatedMap.budgetAmount: " + updatedMap.budgetAmount)
+       console.log("CHECK: periodMap in QML: " + updatedMap)
+       console.log("CHECK: periodMap.budgetAmount in QML:  " + updatedMap.budgetAmount)
        //Get newest period and resend data to graph
        sendWebViewUpdate(updatedMap)
    }
@@ -214,11 +227,15 @@ NavigationPane {
     }
     
     function sendWebViewUpdate(updatedMap) {
-        console.log("Sending out msg: " + "update***" + updatedMap)
+        console.log("CHECK: Sending out msg: " + "update***" + updatedMap)
         webView.postMessage("update***" + updatedMap.budgetAmount + "^" + updatedMap.budgetUsed + "^" + smallDate(updatedMap.endDate))
     }
     
     function smallDate(date) {
+<<<<<<< HEAD
+=======
+        console.log("CHECK: smallDate: " + date);
+>>>>>>> e2b994cd1929a8b2ef4f57d3693821e7a32bb83e
         var splitDate = date.split(".")
         
         if (splitDate[0] == "01")
