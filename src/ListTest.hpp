@@ -79,11 +79,10 @@ public:
     Q_INVOKABLE void newPeriod(QString endDateStr);
     Q_INVOKABLE void updatePeriodExpensesListView(const QString &date1, const QString &date2);
     Q_INVOKABLE void loadAccountCreation();
-    Q_INVOKABLE void reloadWebView();
+    Q_INVOKABLE void reloadWebView(bool shouldClear);
     Q_INVOKABLE void sendEmail();
     Q_INVOKABLE void setUpAccountListModel();
     Q_INVOKABLE void updateBar();
-    Q_INVOKABLE void removeExcessPeriod(QVariant excessPeriod);
     Q_INVOKABLE bool loadQMLScene();
     Q_INVOKABLE bool verifyPin(const QString &pin);
     Q_INVOKABLE bool hasPin();
@@ -190,8 +189,6 @@ signals:
 	void updateGraph(QVariant);
 	void setAccountGraph();
 	void reloadWeb();
-	void emptyExpenseList();
-	void notEmptyExpenseList();
 
 public slots:
 	Q_INVOKABLE void checkDate();

@@ -16,7 +16,6 @@ EasyKeyboardBudget.qml
 EasyKeypad.qml
 EditPage.qml
 GraphContainer.qml
-images/addLarge.png
 images/barBG.png
 images/barFullBG.png
 images/bartemp.png
@@ -94,6 +93,7 @@ images/tutorial/5.png
 images/tutorial/5bot.png
 images/tutorial/6.png
 images/tutorial/6bot.png
+images/tutorial/Thumbs.db
 js/amcharts.js
 js/elycharts.min.js
 js/graph.js

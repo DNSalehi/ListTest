@@ -46,6 +46,7 @@ Sheet {
 	                    closeKeyboard()
 	                    openedKeyboardBool = false;
 	                    budgetApp.clearBudgetAmount()
+                        accountCreationSheet.parent.parent.pop();
 	                    accountCreationSheet.close()
 	                }
                 }
@@ -90,8 +91,10 @@ Sheet {
                layout: StackLayout {}
                layoutProperties: AbsoluteLayoutProperties {
                    positionY: 70
+                   positionX: 22
                }
-               preferredWidth: 768
+               preferredWidth: 723
+               
                Container {
 	               id: nameBorder
 

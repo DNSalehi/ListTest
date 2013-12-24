@@ -200,38 +200,28 @@ Page {
              ActionBar.placement: ActionBarPlacement.OnBar
              
              onTriggered: {
-                 removeDialog.show();
+                 removeDialog.show()
              }
-             
-             attachedObjects: [
-                 SystemToast {
-                     id: deleteToast
-                     body: "Deleted Expense!"
-                     
-                     onPositionChanged: {
-                         console.log("Position changed");
-                         deleteToast.resetPosition();
-                     }
-                 },
-                 SystemDialog {
-                     id: removeDialog
-                     title: "Delete expense"
-                     body: "Are you sure you want to delete expense?"
-                     confirmButton.label: qsTr("Delete")
-                     
-                     onFinished: {
-                         if (result == SystemUiResult.ConfirmButtonSelection) {
-                             console.log("Removing item.");
-                             nav.deleteExpenseToast();
-                             budgetApp.deleteItemAtIndex(selectedItem);
-                             nav.pop();
-                         }
-                     }
-                 }
-             ]
          }
      ]
-
+     
+     attachedObjects: [
+         SystemDialog {
+             id: removeDialog
+             title: "Delete expense"
+             body: "Are you sure you want to delete expense?"
+             confirmButton.label: qsTr("Delete")
+             
+             onFinished: {
+                 if (result == SystemUiResult.ConfirmButtonSelection) {
+                     console.log("Removing item.")
+                     budgetApp.deleteItemAtIndex(selectedItem);
+                     nav.pop()
+                 }
+             }
+         }
+     ]
+	
 	function convertFromDate(prevDate) {
 	    var returnString = ""
 	    var monthString = ""

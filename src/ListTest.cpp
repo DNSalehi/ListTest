@@ -31,6 +31,7 @@ ListTest::~ListTest() {
 
 void ListTest::onStart() {
 	QFile file(QDir::homePath() + QString("/user/accountinfo.json"));
+
 	if (file.exists()) {
 		//Load settings
 		loadSettings();
@@ -250,8 +251,7 @@ void ListTest::deleteAccount(const QString &previousID, int selectedIndex) {
 			//Clears previous ListView, in order to reload the ReportItems
 			periodExpensesModel->clear();
 			updatePeriodView();
-			//Reloads the line graph WebView
-			reloadWebView();
+			reloadWebView(false); //Clear and reload the line graph WebView
 		}
 
 		//Save to file
@@ -381,15 +381,23 @@ bool ListTest::loadQMLScene() {
 	amountLabel = tabbedPane->findChild<Label*>("amountLabel");
 
 	setUpAccountModel();
+	qDebug() << "Account Model set up complete.";
 	setUpPeriodListModel();
+	qDebug() << "Period List Model set up complete.";
 	setUpExpenseListModel();
+	qDebug() << "Expense List Model set up complete.";
 	updateBar();
+	qDebug() << "Bar update complete.";
 	setUpPeriodExpensesListModel();
+	qDebug() << "Period Expense List Model set up complete.";
 
 	Application::instance()->setScene(tabbedPane);
 
 	//Loading QTimer
 	loadTimer();
+	qDebug() << "Timer loaded.";
+
+	//reloadWebView(); //Load the graph
 
 	return true;
 }
@@ -433,40 +441,40 @@ void ListTest::setAccount(QVariant selectedAccount) {
 		//Get accountMap of selected account
 		accountMap = selectedAccount.toMap();
 		accountDataIndex = accountList.indexOf(selectedAccount);
-
+		qDebug() << "New index: " << accountMap["accountID"].toString();
 		//Set selected account isMain to true
 		accountMap["isMain"] = "true";
 		//Breaks below...
 		accountList.replace(accountDataIndex, accountMap);
 
-		//Set selected period isMain to true
-		periodMap["isMain"] = "true";
-
 		//Set primary account
 		primaryAccount = selectedAccount;
 
-		//addPeriodExpenses(); Why modify the expenses?
+		qDebug() << "1";
+		updatePeriodView(); //Update period info to new account
+		qDebug() << "2";
+		//addPeriodExpenses(); Remove next time you see this.
 		//Save to file
+		qDebug() << "3";
 		saveAccountJson();
-		//savePeriods(); Why save the unchanged periods?
+		qDebug() << "4";
+		//savePeriods(); Remove next time you see this.
+		qDebug() << "5";
 
 		//Update app components
 		updateAccountView();
 		//Clears previous ListView, in order to reload the ReportItems
 		periodExpensesModel->clear();
-		updatePeriodView();
-		//Reloads the line graph WebView
-		reloadWebView();
 		fastUpdateListView();
 		updateBar();
 		//Update line graph signal
 		emit updateGraph(periodMap);
+		reloadWebView(true); //Reload the line graph WebView
 
 		//Set budget dates
 		_budgetStartDate = periodMap["startDate"].toString();
 		_budgetEndDate = periodMap["endDate"].toString();
 		_budgetType = periodMap["budgetType"].toString();
-		qDebug() << "Account number set to: " + accountMap["accountID"].toString();
 	}
 }
 
@@ -582,8 +590,9 @@ void ListTest::addAccount(const QString &accountName,
 
 	//Update lists
 	updateAccountView();
-	updateListView(); //Might need to be fastUpdateListView();
+	updateListView();
 	updatePeriodView();
+	reloadWebView(true);
 	updateBar();
 }
 
@@ -749,8 +758,7 @@ void ListTest::newPeriod(QString endDateStr) {
 	//Clears previous ListView, in order to reload the ReportItems
 	periodExpensesModel->clear();
 	updatePeriodView();
-	//Reloads the line graph WebView
-	reloadWebView();
+	reloadWebView(false); //Reload the line graph WebView
 	fastUpdateListView();
 	updateBar();
 }
@@ -880,6 +888,11 @@ void ListTest::addNewRecord(const QString &expenseName, QString expenseAmount,
 
 	if (checkDate == "within") {
 		//No need to change
+		SystemToast *toast = new SystemToast(this);
+
+		toast->setBody("Expense saved.");
+		toast->setPosition(SystemUiPosition::MiddleCenter);
+		toast->show();
 	} else if (checkDate == "past") {
 		SystemToast *toast = new SystemToast(this);
 
@@ -974,7 +987,7 @@ void ListTest::addNewRecord(const QString &expenseName, QString expenseAmount,
 	}
 	saveJson();
 	updatePeriodView();
-	reloadWebView(); // You should probably replace all emit update graphs with this, the load time is about the same, this might even be a little faster
+	reloadWebView(true); // You should probably replace all emit update graphs with this, the load time is about the same, this might even be a little faster
 	fastUpdateListView();
 	updateBar();
 }
@@ -983,27 +996,14 @@ void ListTest::fastUpdateListView() {
 	expenseList = jda.load( QDir::homePath() + QString("/user/expenses") + QString("_")
 									+ accountMap["accountID"].toString()
 									+ QString(".json")).value<QVariantList>();
-	QVariantList currentExpenseList = periodMap["expenses"].toList();
-	if (currentExpenseList.count() == 0) {
-		emit emptyExpenseList();
-	} else if (currentExpenseList.count() > 0) {
-		emit notEmptyExpenseList();
-	}
 	expenseModel->clear();
-	expenseModel->insertList(currentExpenseList);
+	expenseModel->insertList(periodMap["expenses"].toList());
 }
 
 void ListTest::updateListView() {
 	expenseList = jda.load( QDir::homePath() + QString("/user/expenses") + QString("_")
 								+ accountMap["accountID"].toString()
 								+ QString(".json")).value<QVariantList>();
-	//Emit emptyExpenseList that will be caught by ListView in Transactions.qml
-	//In order to put a placeholder to encourage adding an expense
-	if (expenseList.count() == 0) {
-		emit emptyExpenseList();
-	} else if (expenseList.count() > 0) {
-		emit notEmptyExpenseList();
-	}
 
 	expenseModel->clear();
 	expenseModel->insertList(expenseList);
@@ -1014,12 +1014,12 @@ void ListTest::updatePeriodExpensesListView(const QString &date1,
 	QVariant returnPeriod;
 
 	foreach (QVariant it, periodList){
-	QVariantMap selectedPeriod = it.toMap();
-	if ((selectedPeriod["startDate"].toString() == date1) && (selectedPeriod["endDate"].toString() == date2)) {
-		returnPeriod = selectedPeriod;
-		break;
+		QVariantMap selectedPeriod = it.toMap();
+		if ((selectedPeriod["startDate"].toString() == date1) && (selectedPeriod["endDate"].toString() == date2)) {
+			returnPeriod = selectedPeriod;
+			break;
+		}
 	}
-}
 	QVariantList periodExpenseList = returnPeriod.toMap()["expenses"].toList();
 
 	periodExpensesListView = tabbedPane->findChild<ListView*>(
@@ -1105,7 +1105,7 @@ void ListTest::updateAccountView() {
 	accountModel->insertList(accountList);
 }
 
-void ListTest::reloadWebView() {
+void ListTest::reloadWebView(bool shouldClear) {
 	emit reloadWeb();
 }
 
@@ -1795,19 +1795,6 @@ void ListTest::setUpAccountListModel() {
 	accountListView->setDataModel(accountModel);
 }
 
-void ListTest::removeExcessPeriod(QVariant excessPeriod) {
-	qDebug() << "Running remove excess period";
-	int excessPeriodIndex = periodList.indexOf(excessPeriod);
-	periodList.removeAt(excessPeriodIndex);
-
-	//Do you need a replace here??
-
-	saveJson();
-	updatePeriodView();
-	emit updateGraph(periodMap);
-	qDebug() << "Period removed from JSON periodList";
-}
-
 void ListTest::setUpPeriodListModel() {
 	QStringList sortingKey;
 	sortingKey << "isMain" << "yearRank" << "monthRank" << "dayRank";
@@ -1828,16 +1815,6 @@ void ListTest::setUpPeriodListModel() {
 	periodListView = tabbedPane->findChild<ListView*>("periodListView");
 	periodModel = tabbedPane->findChild<GroupDataModel*>("reportModel");
 
-	if (periodModel)
-		qDebug() << "periodModel found";
-	else
-		qDebug() << "periodModel not found";
-
-	if (periodListView)
-		qDebug() << "periodListView found";
-	else
-		qDebug() << "periodListView not found";
-
 	//Set the periods QVariantMap
 	QVariant primaryPeriod = getPrimaryPeriod();
 	periodMap = primaryPeriod.toMap();
@@ -1847,15 +1824,11 @@ void ListTest::setUpPeriodListModel() {
 
 	//periodModel = new GroupDataModel();
 	periodModel->setParent(this);
-	qDebug() << "Before insert list";
-	periodModel->insertList(periodList); // This line creates the errors.
-	qDebug() << "After inserting list";
+	periodModel->insertList(periodList); // periodMap["expenses"].toList()
 	periodModel->setGrouping(ItemGrouping::None);
 	periodModel->setSortingKeys(sortingKey);
 	periodModel->setSortedAscending(false);
-	qDebug() << "Before setting data model";
 	periodListView->setDataModel(periodModel);
-	qDebug() << "After setting data model";
 }
 
 QVariant ListTest::getPrimaryPeriod() {
@@ -1872,16 +1845,17 @@ QVariant ListTest::getPrimaryPeriod() {
 }
 
 void ListTest::setUpExpenseListModel() {
+	QStringList sortingKey;
+	sortingKey << "yearRank" << "monthRank" << "dayRank" << "hourRank"
+			<< "minuteRank" << "secondRank";
 	expenseList = periodMap["expenses"].toList();
 
-	if (expenseList.count() == 0) {
-		emit emptyExpenseList();
-	}
-
-	expenseModel = tabbedPane->findChild<GroupDataModel*>("expenseModel");
+	expenseModel = new GroupDataModel();
 	expenseModel->setParent(this);
 	expenseModel->insertList(expenseList);
 	expenseModel->setGrouping(ItemGrouping::None);
+	expenseModel->setSortingKeys(sortingKey);
+	expenseModel->setSortedAscending(false);
 	expenseListView->setDataModel(expenseModel);
 }
 

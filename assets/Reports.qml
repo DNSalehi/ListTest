@@ -25,8 +25,7 @@ NavigationPane {
 	                id: webView
 	                leftMargin: 0
 	                topMargin: 0
-	                topPadding: 0
-	                leftPadding: 0
+	                
 	                html: "<html><head>" +
 	                //Pass variables
 	                "<script type='text/javascript' src='assets/js/jquery-1.8.3.min.js'></script>" +
@@ -77,10 +76,9 @@ NavigationPane {
 
 				                     onItemAdded: {
 				                         console.log("onItemAdded signal ran.")
-				                         var reportItem = data(indexPath);
-				                         console.log("reportItem.name: " + reportItem.budgetType);
+				                         console.log("Size: " + size());
+				                         var reportItem = data(indexPath); // An instance of the period expense
 				                         //var indexP = (indexPath.length == 1) ? indexPath : indexPath[1]
-				                         console.log("size: " + size());
 				                         //Clear graphDataArray when ListView reloads. (Ex: Setting different account)
 				                         if (size() == 1) 
 				                             graphDataArray = ""
@@ -88,21 +86,13 @@ NavigationPane {
 				                             console.log("Attempting to add to array")
 				                             var qGraphMap = {}
 				                             var amountSaved = parseFloat(reportItem.budgetAmount) - parseFloat(reportItem.budgetUsed)
+				                             console.log("reportItem.endDate: " + reportItem.endDate);
 				                             var endDate = smallDate(reportItem.endDate)
 				                             qGraphMap['months'] = endDate
 				                             qGraphMap['value'] = amountSaved
 				                             console.log("*qGraphMap.months: " + qGraphMap['months'])
 				                             console.log("*qGraphMap.value: " + qGraphMap['value'])
 				                             periodListView.pushGraphDataArray(qGraphMap)
-				                         }
-				                         //Capping the number of periods tracked to 50, performance purpose
-				                         //When the settings page is added, have an option to change this
-				                         if (size() > 2) {
-				                             console.log("Size is greater than 50, removing oldest period.");
-				                             var removablePeriod = data(last());
-                                             //removeAt(last());
-				                             budgetApp.removeExcessPeriod(removablePeriod);
-                                             //Send command here to C++ to delete removablePeriod from json files
 				                         }
 				                     }
 				                 }
@@ -196,7 +186,9 @@ NavigationPane {
        //Get newest period and resend data to graph
        sendWebViewUpdate(updatedMap)
    }
-    function pushSettingPage() {
+
+   
+   function pushSettingPage() {
         if (reportsPage.top == accountPage) {
             reportsPage.pop()
         }
@@ -227,7 +219,6 @@ NavigationPane {
     }
     
     function smallDate(date) {
-        console.log("smallDate: " + date);
         var splitDate = date.split(".")
         
         if (splitDate[0] == "01")

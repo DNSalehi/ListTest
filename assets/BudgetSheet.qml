@@ -81,8 +81,9 @@ Sheet {
                layout: StackLayout {}
                layoutProperties: AbsoluteLayoutProperties {
                    positionY: 50
+                   positionX: 22
                }
-               preferredWidth: 768
+               preferredWidth: 723
                
                Label {
                    id: accountNameLabel

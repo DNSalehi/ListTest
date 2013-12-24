@@ -74,8 +74,9 @@ import bb.cascades 1.0
                layout: StackLayout {}
                layoutProperties: AbsoluteLayoutProperties {
                    positionY: 70
+                   positionX: 22
                }
-               preferredWidth: 768
+               preferredWidth: 723
                Container {
 	               id: nameBorder
 

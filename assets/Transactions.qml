@@ -2,7 +2,6 @@
 import bb.cascades 1.0
 import bb.data 1.0
 import bb.cascades.advertisement 1.0
-import bb.system 1.0
 
 NavigationPane {
     id: nav
@@ -77,6 +76,7 @@ NavigationPane {
 	                        }
 	                    }
 	                    ImageButton {
+	                        visible: true
 	                        defaultImageSource: "asset:///images/barBG.png"
 	                        layoutProperties: AbsoluteLayoutProperties {
 	                            positionX: 56
@@ -101,28 +101,7 @@ NavigationPane {
 	                    ListView {
 	                        id: expenseListView
 	                        objectName: "expenseListView"
-	                        dataModel: GroupDataModel { 
-                                id: expenseModel
-                                objectName: "expenseModel"
-                                sortingKeys: [
-                                "yearRank",
-                                "monthRank",
-                                "dayRank",
-                                "hourRank",
-                                "minuteRank",
-                                "secondRank"
-                                ]
-                                sortedAscending: false
-                                onItemAdded: {
-                                    console.log("Successfully added item.")
-                                }
-                                onItemRemoved: {
-                                    var lastIndexPath = last()
-                                    if (lastIndexPath[0] == undefined) {
-                                        if (nav.top != expenseListPage) nav.popAndDelete()
-                                    }
-                                }
-	                        }
+	                        dataModel: XmlDataModel { }
 	                        listItemComponents: [
 	                            ListItemComponent {
 	                                type: "header"
@@ -149,54 +128,34 @@ NavigationPane {
 	                            nav.push(editPage)
 	                            budgetApp.editAmountText(selectedItem.amount)
 	                        }
-	                        onCreationCompleted: {
-                                budgetApp.emptyExpenseList.connect(createAddImage);
-                                budgetApp.notEmptyExpenseList.connect(deleteAddImage);
-                            }
-                            function createAddImage() {
-                                addContainer.visible = true;
-                                console.log("Will add image here");
-                            }
-                            function deleteAddImage() {
-                                addContainer.visible = false;
-                            	console.log("Will delete add image here");
-                            }
+	                        attachedObjects: [
+	                                                    GroupDataModel {
+	                                                        id: expenseModel
+	                                                        sortingKeys: [
+	                                                            "yearRank",
+	                                                            "monthRank",
+	                                                            "dayRank",
+	                                                            "hourRank",
+	                                                            "minuteRank",
+	                                                            "secondRank"
+	                                                        ]
+	                                                        onItemAdded: {
+	                                                            console.log("Successfully added item.")
+	                                                        }
+	                                                        onItemRemoved: {
+	                                                            var lastIndexPath = last()
+	                                                            if (lastIndexPath[0] == undefined) {
+	                                                                if (nav.top != expenseListPage) nav.popAndDelete()
+	                                                            }
+	                                                        }
+	                                                    }
+	                                                ]
 	                    }
                     }
                     
                     ImageView {
 	                    imageSource: "asset:///images/borderthin2.png"
 	                }
-                    Container {
-                        id: addContainer
-                        visible: false
-                        horizontalAlignment: HorizontalAlignment.Center
-                        verticalAlignment: VerticalAlignment.Center
-                        
-                        layout: StackLayout {
-                            orientation: LayoutOrientation.TopToBottom
-                        }
-                        
-                        ImageView {
-                            horizontalAlignment: HorizontalAlignment.Center
-                            imageSource: "asset:///images/addLarge.png"
-                        }
-                        Label {
-                            preferredWidth: 415
-                            multiline: true
-                            text: "This period is empty, add an expense"
-                    
-                            textStyle {
-                                fontSize: FontSize.Large
-                                textAlign: TextAlign.Center
-                                
-                            }
-                        }
-                        onTouch: {
-                            if (event.isUp())
-                            	switchToAdd()
-                        }
-                    }
                 }
             }
             
@@ -263,7 +222,6 @@ NavigationPane {
             
         }
     }
-        
         attachedObjects: [
             ComponentDefinition {
                 id: editPageDefinition
@@ -275,25 +233,6 @@ NavigationPane {
             }
         ]
     }
-    attachedObjects: [
-        SystemToast {
-            id: deleteToast
-            body: "Deleted Expense!"
-            
-            onPositionChanged: {
-                console.log("Position changed");
-                deleteToast.resetPosition();
-            }
-        },
-        ComponentDefinition {
-            id: accountPageDefinition
-            source: "AccountPage.qml"   
-        },
-        ComponentDefinition {
-            id: settingsPageDefinition
-            source: "Settings.qml"   
-        }
-    ]
 
     //Pushing pages from main.qml for the top menu
     function pushSettingPage() {
@@ -316,6 +255,16 @@ NavigationPane {
             budgetApp.setUpAccountListModel()
         }
     }
+    attachedObjects: [
+        ComponentDefinition {
+            id: accountPageDefinition
+            source: "AccountPage.qml"   
+        },
+        ComponentDefinition {
+            id: settingsPageDefinition
+            source: "Settings.qml"   
+        }
+    ]
     //Clears selection when backing out from a selected item
     onTopChanged: {
         if (page == expenseListPage) 
@@ -334,9 +283,5 @@ NavigationPane {
             console.log("Destroying Accounts page")
             page.destroy()
         }
-    }
-    
-    function deleteExpenseToast() {
-    	deleteToast.show();
     }
 }

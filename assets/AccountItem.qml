@@ -142,7 +142,7 @@ import bb.system 1.0
 		                attachedObjects: [
 			                SystemToast {
 			                    id: deleteToast
-			                    body: "Deleted account!"			                    
+			                    body: "Deleted account!"
 			                },
 			                SystemDialog {
 			                    id: deleteDialog
